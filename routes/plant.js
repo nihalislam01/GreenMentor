@@ -1,6 +1,7 @@
 const express = require('express');
 const connection = require('../connection');
 const router = express.Router();
+const updatePlant = require('../services/updatePlant');
 
 router.post('/add',(request,response)=>{
     let plant = request.body;
@@ -26,51 +27,15 @@ router.get('/get',(request,response)=>{
 });
 
 router.patch('/update-name',(request,response)=>{
-    let plant = request.body;
-    var query = "update plant set name=? where plant_id=?";
-    connection.query(query,[plant.name,plant.plant_id],(error,results)=>{
-        if(!error) {
-            if (results.affectRows == 0) {
-                return response.status(404).json({message: "Plant id does not exists."});
-            } else {
-                return response.status(200).json({message: "Name updated successfully."});
-            }
-        } else {
-            return response.status(500).json(error);
-        }
-    });
+    return updatePlant.updatePlant("name",request,response,connection);
 });
 
 router.patch('/update-image',(request,response)=>{
-    let plant = request.body;
-    var query = "update plant set image_url=? where plant_id=?";
-    connection.query(query,[plant.image_url,plant.plant_id],(error,results)=>{
-        if(!error) {
-            if (results.affectRows == 0) {
-                return response.status(404).json({message: "Plant id does not exists."});
-            } else {
-                return response.status(200).json({message: "Image updated successfully."});
-            }
-        } else {
-            return response.status(500).json(error);
-        }
-    });
+    return updatePlant.updatePlant("image_url",request,response,connection);
 });
 
 router.patch('/update-watering',(request,response)=>{
-    let plant = request.body;
-    var query = "update plant set watering=? where plant_id=?";
-    connection.query(query,[plant.watering,plant.plant_id],(error,results)=>{
-        if(!error) {
-            if (results.affectRows == 0) {
-                return response.status(404).json({message: "Plant id does not exists."});
-            } else {
-                return response.status(200).json({message: "Watering updated successfully."});
-            }
-        } else {
-            return response.status(500).json(error);
-        }
-    });
+    return updatePlant.updatePlant("watering",request,response,connection);
 });
 
 module.exports = router;
