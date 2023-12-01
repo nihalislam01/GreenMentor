@@ -1,7 +1,11 @@
-const { response } = require('express');
 const express = require('express');
 const connection = require('../connection');
 const router = express.Router();
+
+router.get('/signup',(request,response) => {
+    const message = "Welcome to signup page.";
+    response.render('signup',{ message });
+});
 
 router.post('/signup',(request,response) => {
     let user = request.body;
@@ -12,18 +16,25 @@ router.post('/signup',(request,response) => {
                 query = "insert into user(first_name,last_name,email,password,admin,non_premium,premium) values(?,?,?,?,0,1,0)";
                 connection.query(query,[user.first_name,user.last_name,user.email,user.password],(error,resultls) => {
                     if(!error) {
-                        return response.status(200).json({message: "Successfully Registered"});
+                        const message = "Registered Successfully. Please login."
+                        response.render('login',{ message });
                     } else {
-                        return response.status(500).json(error);
+                        response.status(500).send(error);
                     }
                 });
             } else {
-                return response.status(400).json({message: "Email Already Exists."});
+                const message = "Email Already Exists.";
+                response.render('signup',{ message });
             }
         } else {
-            return response.status(500).json(error);
+            response.status(500).send(error);
         }
     });
+});
+
+router.get('/login',(request,response) => {
+    const message = "Welcome to Login page.";
+    response.render('login',{ message });
 });
 
 router.post('/login',(request,response) => {
@@ -32,20 +43,21 @@ router.post('/login',(request,response) => {
     connection.query(query,[user.email],(error,results) => {
         if(!error) {
             if (results.length <= 0 || results[0].password!=user.password) {
-                return response.status(401).json({message: "Incorrect username or password."});
+                const message = "Incorrect username or password.";
+                response.render('login',{ message });
             } else if(results[0].password==user.password) {
-                return response.status(200).json({message: "Login Successful."});
+                response.redirect('/plant/get');
             } else {
-                return response.status(400).json({message: "Something went wrong. Please try again."});
+                response.status(400).send("Something went wrong. Please try again.");
             }
         } else {
-            return response.status(500).json(error);
+            response.status(500).send(error);
         }
     });
 });
 
 router.get('/get',(request,response)=> {
-    var query = "select user_id,first_name,last_name,email,password from user where non_premium=1";
+    var query = "select * from user where non_premium=1 order by user_id desc";
     connection.query(query,(error,results)=> {
         if(!error) {
             return response.status(200).json(results);
@@ -94,6 +106,12 @@ router.post('/change-password',(request,response)=>{
             return response.status(500).json(error);
         }
     });
-})
+});
+
+router.get('/profile',(request,response) => {
+    const user_id = request
+    var query = "select * from user where user_id=?"
+    response.render('profile');
+});
 
 module.exports = router;

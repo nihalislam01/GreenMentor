@@ -19,7 +19,7 @@ router.get('/get',(request,response)=>{
     var query = "select * from plant order by plant_id desc";
     connection.query(query,(error,results)=>{
         if(!error) {
-            return response.status(200).json(results);
+            response.render('plants',{ results });
         } else {
             return response.status(500).json(error);
         }

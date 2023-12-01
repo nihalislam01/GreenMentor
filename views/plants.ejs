@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+    <title>Plants</title>
+</head>
+<body>
+    <div>
+        <a href="/plant/get">Home</a>
+        <a href="/post/get">Explore</a>
+        <a href="/user/profile">Profile</a>
+    </div>
+    <table>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Watering</th>
+        </tr>
+        <% if(results.length > 0) { %>
+            <% results.forEach(plant => { %>
+                <tr>
+                    <td><img src="<%= plant.image_url %>" alt="Image"></td>
+                    <td><%= plant.name %></td>
+                    <td><%= plant.watering %></td>
+                </tr>
+            <% }); %>
+        <% } %>
+    </table>
+</body>
+</html>

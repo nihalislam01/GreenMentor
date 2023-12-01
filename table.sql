@@ -22,3 +22,28 @@ create table plant(
     foreign key (admin_user_id) references user(user_id)
 );
 
+create table event(
+    event_id int primary key AUTO_INCREMENT,
+    start_date date,
+    end_date date,
+    location varchar(250),
+    admin_user_id int,
+    foreign key (admin_user_id) references user(user_id)
+);
+
+create table reminder(
+    reminder_id int primary key AUTO_INCREMENT,
+    hour char(2),
+    minute char(2),
+    general_user_id int,
+    foreign key (general_user_id) references user(user_id)
+);
+
+create table post(
+    post_id int primary key AUTO_INCREMENT,
+    image blob,
+    description varchar(500),
+    premium_user_id int,
+    foreign key (premium_user_id) references user(user_id)
+);
+
