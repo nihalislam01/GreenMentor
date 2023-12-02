@@ -1,6 +1,10 @@
 const express = require('express');
 const connection = require('../connection');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+var auth = require('../services/authentication');
+var checkRole = require('../services/checkRole');
+require('dotenv').config();
 
 router.get('/signup',(request,response) => {
     const message = "Welcome to signup page.";
@@ -39,14 +43,17 @@ router.get('/login',(request,response) => {
 
 router.post('/login',(request,response) => {
     let user = request.body;
-    var query = "select email,password,admin,non_premium,premium from user where email=?";
+    var query = "select * from user where email=?";
     connection.query(query,[user.email],(error,results) => {
         if(!error) {
             if (results.length <= 0 || results[0].password!=user.password) {
                 const message = "Incorrect username or password.";
                 response.render('login',{ message });
             } else if(results[0].password==user.password) {
-                response.redirect('/plant/get');
+                const res = { user_id: results[0].user_id, email: results[0].email,admin: results[0].admin, non_premium: results[0].non_premium, premium: results[0].premium };
+                const accessToken = jwt.sign(res,process.env.ACCESS_TOKEN,{expiresIn:'8h'});
+                response.cookie('token', accessToken, { httpOnly: true });
+                response.redirect('/user/profile');
             } else {
                 response.status(400).send("Something went wrong. Please try again.");
             }
@@ -56,7 +63,7 @@ router.post('/login',(request,response) => {
     });
 });
 
-router.get('/get',(request,response)=> {
+router.get('/get',auth.authenticateToken,checkRole.checkRole,(request,response)=> {
     var query = "select * from user where non_premium=1 order by user_id desc";
     connection.query(query,(error,results)=> {
         if(!error) {
@@ -67,7 +74,7 @@ router.get('/get',(request,response)=> {
     });
 });
 
-router.patch('/update-premium',(request,response)=>{
+router.patch('/update-premium',auth.authenticateToken,(request,response)=>{
     let user = request.body;
     var query = "update user set premium=? where id=?";
     connection.query(query,[user.premium,user.id],(error,results)=>{
@@ -83,7 +90,7 @@ router.patch('/update-premium',(request,response)=>{
     });
 });
 
-router.post('/change-password',(request,response)=>{
+router.post('/change-password',auth.authenticateToken,(request,response)=>{
     let user = request.body;
     var query = "select * from user where email=? and password=?";
     connection.query(query,[user.email,user.previous_password],(error,results)=>{
@@ -108,10 +115,21 @@ router.post('/change-password',(request,response)=>{
     });
 });
 
-router.get('/profile',(request,response) => {
-    const user_id = request
-    var query = "select * from user where user_id=?"
-    response.render('profile');
+router.get('/profile',auth.authenticateToken,(request,response) => {
+    const user_id = request.user.user_id;
+    var query = `select * from user where user_id=${user_id}`;
+    connection.query(query,(error,results)=>{
+        if(!error) {
+            response.status(200).json(results);
+        } else {
+            response.status(500).json(error);
+        }
+    });
 });
+
+router.post('/logout', (request, response) => {
+    response.clearCookie('token');
+    response.redirect('/user/login');
+  });
 
 module.exports = router;

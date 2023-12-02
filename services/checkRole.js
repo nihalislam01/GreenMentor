@@ -1,12 +1,10 @@
 require('dotenv').config();
 
 function checkRole(request, response, next) {
-    if(response.locals.non_premium == 1) {
+    if(response.locals.non_premium == 1)
         response.sendStatus(401)
-    }
-    else {
+    else
         next()
-    }
 }
 
-module.exports = { checkRole:checkRole }
+module.exports = { checkRole: checkRole }
