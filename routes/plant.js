@@ -1,5 +1,7 @@
 const express = require('express');
 const connection = require('../connection');
+var auth = require('../services/authentication');
+var checkAdmin = require('../services/checkAdmin');
 const router = express.Router();
 const updatePlant = require('../services/updatePlant');
 
@@ -15,26 +17,26 @@ router.post('/add',(request,response)=>{
     });
 });
 
-router.get('/get',(request,response)=>{
+router.get('/get',auth.authenticateToken,(request,response)=>{
     var query = "select * from plant order by plant_id desc";
     connection.query(query,(error,results)=>{
         if(!error) {
             response.render('plants',{ results });
         } else {
-            return response.status(500).json(error);
+            response.status(500).send(error);
         }
     });
 });
 
-router.patch('/update-name',(request,response)=>{
+router.patch('/update-name',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=>{
     return updatePlant.updatePlant("name",request,response,connection);
 });
 
-router.patch('/update-image',(request,response)=>{
+router.patch('/update-image',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=>{
     return updatePlant.updatePlant("image_url",request,response,connection);
 });
 
-router.patch('/update-watering',(request,response)=>{
+router.patch('/update-watering',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=>{
     return updatePlant.updatePlant("watering",request,response,connection);
 });
 

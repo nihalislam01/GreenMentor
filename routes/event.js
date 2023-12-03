@@ -14,13 +14,13 @@ router.post('/add',(request,response)=>{
     });
 });
 
-router.get('/get',(request,response)=>{
+router.get('/get',auth.authenticateToken,(request,response)=>{
     var query = "select * from event order by event_id desc";
     connection.query(query,(error,results)=>{
         if(!error) {
-            return response.status(200).json(results);
+            response.render('events',{ results });
         } else {
-            return response.status(500).json(error);
+            response.status(500).send(error);
         }
     });
 });

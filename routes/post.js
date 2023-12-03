@@ -1,5 +1,6 @@
 const express = require('express');
 const connection = require('../connection');
+const auth = require('../services/authentication');
 const router = express.Router();
 
 router.post('/add',(request,response)=>{
@@ -14,15 +15,13 @@ router.post('/add',(request,response)=>{
     });
 });
 
-router.get('/get',(request,response)=>{
-    let user = response.locals.body;
+router.get('/get',auth.authenticateToken,(request,response)=>{
     var query = "select * from post order by post_id desc";
     connection.query(query,(error,results)=>{
         if(!error) {
-            console.log(user);
-            return response.status(200).json(results);
+            return response.render('posts',{ results });
         } else {
-            return response.status(500).json(error);
+            return response.status(500).send(error);
         }
     });
 });

@@ -3,17 +3,17 @@ const connection = require('../connection');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 var auth = require('../services/authentication');
-var checkRole = require('../services/checkRole');
+var checkAdmin = require('../services/checkAdmin');
 require('dotenv').config();
 
 router.get('/signup',(request,response) => {
-    const message = "Welcome to signup page.";
+    const message = null;
     response.render('signup',{ message });
 });
 
 router.post('/signup',(request,response) => {
     let user = request.body;
-    var query = "select email,password,admin,non_premium,premium from user where email=?";
+    var query = "select email from user where email=?";
     connection.query(query,[user.email],(error,results)=>{
         if(!error) {
             if(results.length <= 0) {
@@ -37,7 +37,7 @@ router.post('/signup',(request,response) => {
 });
 
 router.get('/login',(request,response) => {
-    const message = "Welcome to Login page.";
+    const message = null;
     response.render('login',{ message });
 });
 
@@ -50,10 +50,20 @@ router.post('/login',(request,response) => {
                 const message = "Incorrect username or password.";
                 response.render('login',{ message });
             } else if(results[0].password==user.password) {
-                const res = { user_id: results[0].user_id, email: results[0].email,admin: results[0].admin, non_premium: results[0].non_premium, premium: results[0].premium };
-                const accessToken = jwt.sign(res,process.env.ACCESS_TOKEN,{expiresIn:'8h'});
+                const user = {
+                    user_id: results[0].user_id,
+                    first_name: results[0].first_name,
+                    last_name: results[0].last_name,
+                    email: results[0].email,
+                    password: results[0].password,
+                    license: results[0].license,
+                    admin: results[0].admin,
+                    non_premium: results[0].non_premium,
+                    premium: results[0].premium
+                  }
+                const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN,{expiresIn:'8h'});
                 response.cookie('token', accessToken, { httpOnly: true });
-                response.redirect('/user/profile');
+                response.redirect('/post/get');
             } else {
                 response.status(400).send("Something went wrong. Please try again.");
             }
@@ -63,7 +73,7 @@ router.post('/login',(request,response) => {
     });
 });
 
-router.get('/get',auth.authenticateToken,checkRole.checkRole,(request,response)=> {
+router.get('/get',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=> {
     var query = "select * from user where non_premium=1 order by user_id desc";
     connection.query(query,(error,results)=> {
         if(!error) {
@@ -122,7 +132,7 @@ router.get('/profile',auth.authenticateToken,(request,response) => {
         if(!error) {
             response.render('profile',{ results });
         } else {
-            response.status(500).json(error);
+            response.status(500).send(error);
         }
     });
 });
@@ -130,6 +140,6 @@ router.get('/profile',auth.authenticateToken,(request,response) => {
 router.post('/logout', (request, response) => {
     response.clearCookie('token');
     response.redirect('/user/login');
-  });
+});
 
 module.exports = router;
