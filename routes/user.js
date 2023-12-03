@@ -120,7 +120,7 @@ router.get('/profile',auth.authenticateToken,(request,response) => {
     var query = `select * from user where user_id=${user_id}`;
     connection.query(query,(error,results)=>{
         if(!error) {
-            response.status(200).json(results);
+            response.render('profile',{ results });
         } else {
             response.status(500).json(error);
         }
