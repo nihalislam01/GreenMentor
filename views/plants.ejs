@@ -1,28 +1,53 @@
 <!DOCTYPE html>
-<head>
-    <title>Plants</title>
-</head>
-<body>
-    <div>
-        <a href="/plant/get">Home</a>
-        <a href="/post/get">Explore</a>
-        <a href="/user/profile">Profile</a>
-    </div>
-    <table>
-        <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Watering</th>
-        </tr>
-        <% if(results.length > 0) { %>
-            <% results.forEach(plant => { %>
-                <tr>
-                    <td><img src="<%= plant.image_url %>" alt="Image"></td>
-                    <td><%= plant.name %></td>
-                    <td><%= plant.watering %></td>
-                </tr>
+<html lang="en">
+  <head>
+    <title>Plant Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/plants.css" />
+  </head>
+
+  <body class="back bg-cover">
+    <% if (message) { %>
+        <script>
+            alert('<%= message %>');
+          </script>
+    <% } %>
+    <div class="mx-auto p-4">
+      <h1 class="justify-center middle pt-20">World of Plants</h1>
+      <div class="grid grid-cols-1 container md:grid-cols-3 gap-y-6 gap-x-2">
+        <% if(plants.length > 0) { %>
+            <% plants.forEach(plant => { %>
+            <div
+                class="bg-emerald-50 plantCard rounded-lg shadow-lg overflow-hidden"
+            >
+            <% if (plant.image_url) { %>
+                <img
+                  class="object-cover h-4/5 p-4"
+                  src="<%= plant.image_url %>"
+                  alt="Image"
+                />
+            <% } else { %>
+                <img
+                class="object-cover h-4/5 p-4"
+                src="/default_image.png"
+                alt="Image"
+              />
+            <% } %>
+                <div class="p-4">
+                  <button
+                    class="text-blue-800 px-4 py-2 rounded pl-14 hover:bg-green-200"
+                  >
+                  <%= plant.name %>
+                  </button>
+                </div>
+            </div>
             <% }); %>
         <% } %>
-    </table>
-</body>
+      </div>
+    </div>
+    <script
+      src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"
+      data-auto-replace-svg="nest"
+    ></script>
+  </body>
 </html>

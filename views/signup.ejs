@@ -5,7 +5,9 @@
 <body>
     <h1>Green Mentor</h1>
     <% if (message) { %>
-        <p><%= message %></p>
+        <script>
+            alert('<%= message %>');
+        </script>
     <% } %>
     <form action="/user/signup" method="post">
         <input type="text" name="first_name" placeholder="First Name" required>

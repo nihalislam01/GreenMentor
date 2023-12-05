@@ -6,7 +6,9 @@
 <body>
     <h1 class="header">Green Mentor</h1>
     <% if (message) { %>
-        <p><%= message %></p>
+        <script>
+            alert('<%= message %>');
+          </script>
     <% } %>
     <form action="/user/login" method="post">
         <input type="email" name="email" placeholder="Email" required>
