@@ -3,17 +3,49 @@
   <head>
     <title>Plant Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/plants.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
 
   <body class="back bg-cover">
-    <% if (message) { %>
-        <script>
-            alert('<%= message %>');
-          </script>
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+      <script>
+        alert('<%= message %>');
+      </script>
     <% } %>
+    <nav class="nav">
+      <h1>GreenMentor</h1>
+      <div>
+        <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+          >Dashboard</a
+        >
+        <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+        >Plants</a
+        >
+        <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+          >Events</a
+        >
+        <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+        >My Plants</a
+      >
+        <% if(premium) { %>
+          <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+          >My Posts</a
+        >
+      <% } %>
+        <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+          >Profile</a
+        >
+      </div>
+    </nav>
+    <div>
+    </div>
     <div class="mx-auto p-4">
       <h1 class="justify-center middle pt-20">World of Plants</h1>
+      <form class="searchbar" action="/plant/search" method="post">
+        <input type="text" placeholder="Search Plants" name="query">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass fa-xl"></i></button>
+      </form>
       <div class="grid grid-cols-1 container md:grid-cols-3 gap-y-6 gap-x-2">
         <% if(plants.length > 0) { %>
             <% plants.forEach(plant => { %>
@@ -33,13 +65,12 @@
                 alt="Image"
               />
             <% } %>
-                <div class="p-4">
-                  <button
-                    class="text-blue-800 px-4 py-2 rounded pl-14 hover:bg-green-200"
-                  >
-                  <%= plant.name %>
-                  </button>
-                </div>
+              <div class="p-4">
+
+                <a href="/plant/plant-profile/<%= plant.plant_id %>"><button class="text-blue-800 px-4 py-2 rounded pl-14 hover:bg-green-200">
+                    <%= plant.name %>
+                  </button></a>
+              </div>
             </div>
             <% }); %>
         <% } %>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-white">
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+          alert('<%= message %>');
+        </script>
+      <% } %>
+        <nav class="nav">
+          <h1>GreenMentor</h1>
+          <div>
+            <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+              >Dashboard</a
+            >
+            <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+            >Plants</a
+            >
+            <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+              >Events</a
+            >
+            <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+            >My Plants</a
+          >
+            <% if(premium) { %>
+              <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+              >My Posts</a
+            >
+          <% } %>
+            <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+              >Profile</a
+            >
+          </div>
+        </nav>
+    <div
+      class="flex flex-col items-center justify-center min-h-screen p-4 bg-green-100"
+    >
+      <h1 class="text-4xl font-bold text-green-800 mt-4 mb-2">
+        <%= event_info.title %>
+      </h1>
+      <p class="text-xl text-green-700 mb-4">
+        <%= formattedDate(event_info.start_date) %> - <%= formattedDate(event_info.end_date) %>
+      </p>
+      <p class="italic text-lg text-gray-600 mb-4">
+        <%= event_info.location %>
+      </p>
+      <p class="text-md text-gray-800 px-4 text-center mb-4">
+        <%= event_info.description %>
+      </p>
+      <% if(event_started && !event_happening) { %>
+            <p>Event ended. check the upcomming events</p>
+        <% } else if (registered) { %>
+            <% if(event_happening) { %>
+                <a href="/event/participate/<%= event_info.event_id %>"><button
+                class="bg-green-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-colors"
+                >
+                    Participate
+                </button></a>
+            <% } else { %>
+                <p>Thank you for registering with us. Please wait for event to start.</p>
+            <% } %>
+        <% } else { %>
+            <% if(event_happening) { %>
+                <p>Opps looks like you didn't register for this event. Go to upcomming events section and register for upcomming events.</p>
+            <% } else { %>
+                <a href="/event/register/<%= event_info.event_id %>"><button
+                class="bg-green-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-colors"
+            >
+                Register for Event
+            </button></a>
+            <% } %>
+        <% } %>
+    </div>
+    <div class="bg-emerald-50 p-10 rounded-lg shadow">
+      <table class="w-full">
+        <thead>
+          <tr>
+            <th class="text-left">Image</th>
+            <th class="text-left pl-2">Name</th>
+            <th class="text-left">Plant Name</th>
+            <th class="text-left">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(participations.length > 0) { %>
+            <% participations.forEach(participation=>{ %>
+              <% if(participation.status) { %>
+                <tr>
+                  <td><image src="/uploads/<%= participation.image %>" class="thumbnail"></image></td>
+                  <td><%= participation.first_name %> <%= participation.last_name %></td>
+                  <td class="pl-4"><%= participation.plant_name %></td>
+                  <td class="pl-2"><%= formattedDate(participation.date) %></td>
+                </tr>
+              <% } %>
+            <% }); %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

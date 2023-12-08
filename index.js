@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const plantRoute = require('./routes/plant');
 const eventRoute = require('./routes/event');
 const postRoute = require('./routes/post');
+const formattedDate = require('./services/formattedDate');
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -20,8 +21,19 @@ app.use('/plant',plantRoute);
 app.use('/event',eventRoute);
 app.use('/post',postRoute);
 
-app.get('/',(request,response)=>{
+app.get('/home',(request,response)=>{
     response.render('cover',{message: request.query.message });
+});
+app.get('/events',(request,response)=>{
+    query = "select event_id,title,start_date,end_date,location from event where start_date<CURRENT_TIMESTAMP and end_date>CURRENT_TIMESTAMP order by event_id desc";
+    connection.query(query,(error,results)=>{
+        if(!error){
+            response.render('cover-event',{message: request.query.message, events: results, formattedDate: formattedDate.formattedDate });
+        } else {
+            var message = "Something went wrong. Please try again."
+            response.redirect(`/home?message=${encodeURIComponent(message)}`)
+        }
+    });
 });
 
 module.exports = app;

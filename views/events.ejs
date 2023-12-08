@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Event Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .full-height {
+        height: 600px;
+      }
+    </style>
+  </head>
+
+  <body
+    class="back bg-cover drop-shadow-2xl font-sans leading-normal tracking-normal"
+  >
+  <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+    <script>
+      alert('<%= message %>');
+    </script>
+  <% } %>
+  <nav class="nav">
+    <h1>GreenMentor</h1>
+    <div>
+      <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+        >Dashboard</a
+      >
+      <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+      >Plants</a
+      >
+      <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+        >Events</a
+      >
+      <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+      >My Plants</a
+    >
+      <% if(premium) { %>
+        <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+        >My Posts</a
+      >
+    <% } %>
+      <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+        >Profile</a
+      >
+    </div>
+  </nav>
+    <div class="m-40 mx-auto px-4 py-10">
+        <h2 class="text-2xl ml-20 justify-between font-bold mb-6">
+          Events Happening Now
+        </h2>
+        <div class="space-y-8">
+          <% if (events.length > 0) { %>
+              <% events.forEach(event => { %>
+                <% if(current_date>event.start_date && event.end_date>current_date) { %>
+                  <div class="w-auto length p-20 bg-emerald-50">
+                      <div class="flex justify-between items-center">
+                      <h3 class="text-xl font-semibold"><%= event.title %></h3>
+                      <span class="text-sm text-gray-500"><%= formattedDate(event.start_date).slice(3) %></span>
+                      </div>
+                      <p class="text-gray-600"><%= event.location %></p>
+                      <p class="my-2 text-gray-500"><%= formattedDate(event.start_date) %> - <%= formattedDate(event.end_date) %></p>
+                      <a href="/event/profile/<%= event.event_id %>" class="text-blue-600 hover:underline"
+                      >View Event Details →</a>
+                  </div>
+                <% } %>
+              <% }); %>
+          <% } %>
+        </div>
+        <h2 class="text-2xl ml-20 justify-between font-bold mb-6">
+          Upcomming events
+        </h2>
+        <div class="space-y-8">
+          <% if (events.length > 0) { %>
+              <% events.forEach(event => { %>
+                <% if(event.start_date>current_date) { %>
+                  <div class="w-auto length p-20 bg-emerald-50">
+                      <div class="flex justify-between items-center">
+                      <h3 class="text-xl font-semibold"><%= event.title %></h3>
+                      <span class="text-sm text-gray-500"><%= formattedDate(event.start_date).slice(3) %></span>
+                      </div>
+                      <p class="text-gray-600"><%= event.location %></p>
+                      <p class="my-2 text-gray-500"><%= formattedDate(event.start_date) %> - <%= formattedDate(event.end_date) %></p>
+                      <a href="/event/profile/<%= event.event_id %>" class="text-blue-600 hover:underline"
+                      >View Event Details →</a>
+                  </div>
+                <% } %>
+              <% }); %>
+          <% } %>
+      <h2 class="text-2xl ml-20 justify-between font-bold mb-6">
+        Previous Events
+      </h2>
+      <div class="space-y-8">
+        <% if (events.length > 0) { %>
+            <% events.forEach(event => { %>
+              <% if(current_date>event.end_date) { %>
+                <div class="w-auto length p-20 bg-emerald-50">
+                    <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-semibold"><%= event.title %></h3>
+                    <span class="text-sm text-gray-500"><%= formattedDate(event.start_date).slice(3) %></span>
+                    </div>
+                    <p class="text-gray-600"><%= event.location %></p>
+                    <p class="my-2 text-gray-500"><%= formattedDate(event.start_date) %> - <%= formattedDate(event.end_date) %></p>
+                    <a href="/event/profile/<%= event.event_id %>" class="text-blue-600 hover:underline"
+                    >View Event Details →</a>
+                </div>
+              <% } %>
+            <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

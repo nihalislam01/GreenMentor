@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Add Plants</title>
+  <link rel="stylesheet" href="/css/form-styles.css" />
+</head>
+<body>
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+            alert('<%= message %>');
+        </script>
+    <% } %>
+      <div class="form">
+      <form action="/plant/add" method="post">
+          <input type="text" name="name" placeholder="Name">
+          <input type="text" name="image_url" placeholder="Image Url">
+          <input type="text" name="watering" placeholder="Watering">
+          <div id="inputContainer">
+            <input type="text" name="sunlight[]" placeholder="sunlight">
+          </div>
+          <button type="button" onclick="addInput()">Add Input</button>
+          <button type="submit">Add Post</button>
+      </form>
+    </div>
+</body>
+<script>
+    function addInput() {
+      const inputContainer = document.getElementById('inputContainer');
+      const newInput = document.createElement('input');
+      newInput.type = 'text';
+      newInput.name = 'sunlight[]';
+      inputContainer.appendChild(newInput);
+    }
+  </script>
+</html>

@@ -19,7 +19,7 @@
   <body
     class="back bg-cover drop-shadow-2xl font-sans leading-normal tracking-normal"
   >
-  <% if (message) { %>
+  <% if (message && message!=undefined && message!="" && message!="undefined") { %>
     <script>
       alert('<%= message %>');
     </script>
@@ -30,6 +30,17 @@
       >
         <div class="flex ml-128 mb-12">
           <h1 style="padding-left: 70px">GreenMentor</h1>
+          <div style="margin-left: 900px">
+            <a href="/home" class="text-gray-600 ml-4 hover:text-green-500"
+              >Home</a
+            >
+            <a href="/events" class="text-gray-600 ml-4 hover:text-green-500"
+              >Events</a
+            >
+            <a href="/user/login" class="text-gray-600 ml-4 hover:text-green-500"
+              >Login</a
+            >
+          </div>
         </div>
         <div>
           <div
@@ -47,7 +58,7 @@
             <div class="flex space-x-4">
               <a
                 href="/user/login"
-                class="bg-blue-500 text-white px-5 py-3 rounded-full hover:bg-green-600"
+                class="bg-blue-500 text-white px-5 py-3 rounded-full hover:bg-blue-600"
               >
                 Login
               </a>

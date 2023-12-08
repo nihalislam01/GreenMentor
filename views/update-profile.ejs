@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Edit Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+
+  <body class="back bg-cover h-screen">
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+      <script>
+        alert('<%= message %>');
+      </script>
+    <% } %>
+    <nav class="nav">
+      <h1>GreenMentor</h1>
+      <div>
+        <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+          >Dashboard</a
+        >
+        <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+        >Plants</a
+        >
+        <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+          >Events</a
+        >
+        <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+        >My Plants</a
+      >
+        <% if(premium) { %>
+          <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+          >My Posts</a
+        >
+      <% } %>
+        <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+          >Profile</a
+        >
+      </div>
+    </nav>
+    <div class="flex h-full pl-10 pr-10 pt-10 min-h-screen">
+      <div
+        class="w-1/3 bg-emerald-100 p-10 flex flex-col justify-center items-start"
+      >
+      <% if(user_info.image!=null) { %>
+        <img
+          src="/uploads/<%= user_info.image %>"
+          alt="user"
+          class="rounded-full p-10 mb-4"
+        />
+      <% } else { %>
+            <img
+            src="/default_user.png"
+            alt="user"
+            class="rounded-full p-10 mb-4"
+          />
+      <% } %>
+      </div>
+      <div class="w-2/3 bg-emerald-50 p-10 flex flex-col justify-center">
+        <h2 class="text-3xl font-semibold mb-4">Edit Profile</h2>
+        <form action="/user/update-profile" method="POST" enctype="multipart/form-data">
+          <label for="image">Choose an image</label>
+          <input type="file" name="image" accept="image/*">
+          <input
+            type="text"
+            name="first_name"
+            placeholder="First Name"
+            value="<%= user_info.first_name %>"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
+            required
+          />
+          <input
+            type="text"
+            name="last_name"
+            placeholder="Last Name"
+            value="<%= user_info.last_name %>"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
+            required
+          />
+          <input
+            type="date"
+            name="birth_date"
+            value="<%= user_info.birth_date %>"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            value="<%= user_info.email %>"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
+            placeholder="yourname@example.com"
+            required
+          />
+          <input
+            type="text"
+            name="phone_no"
+            placeholder="Phone Number"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
+            required
+          />
+          <button
+            type="submit"
+            class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+          >
+            Save Update
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Request Premium</title>
+  <link rel="stylesheet" href="/css/form-styles.css" />
+</head>
+<body>
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+            alert('<%= message %>');
+        </script>
+    <% } %>
+    <nav class="nav">
+        <h1>GreenMentor</h1>
+        <div>
+          <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+            >Dashboard</a
+          >
+          <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >Plants</a
+          >
+          <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+            >Events</a
+          >
+          <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >My Plants</a
+        >
+          <% if(premium) { %>
+            <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+            >My Posts</a
+          >
+        <% } %>
+          <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+            >Profile</a
+          >
+        </div>
+      </nav>
+      <div class="form">
+    <form action="/user/request-premium" method="post">
+        <h1>Update plan</h1>
+        <p>999.99 TK</p>
+        <input type="text" name="card_no" placeholder="Enter your card number" required>
+        <input type="password" name="pin" placeholder="Enter your 6 digit PIN" required>
+        <button type="submit">Update to Premium Plan</button>
+    </form>
+  </div>
+</body>
+</html>

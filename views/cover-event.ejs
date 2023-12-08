@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Event Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      .full-height {
+        height: 600px;
+      }
+    </style>
+  </head>
+
+  <body
+    class="back bg-cover drop-shadow-2xl font-sans leading-normal tracking-normal"
+  >
+  <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+    <script>
+      alert('<%= message %>');
+    </script>
+  <% } %>
+    <div class="full-height flex justify-center">
+      <div
+        class="transparency-layer h-screen bg-emerald-50 justify-center p-10 mt-10 rounded-lg"
+      >
+        <div class="flex ml-128 mb-12">
+          <h1 style="padding-left: 70px">GreenMentor</h1>
+          <div style="margin-left: 900px">
+            <a href="/home" class="text-gray-600 ml-4 hover:text-green-500"
+              >Home</a
+            >
+            <a href="/events" class="text-gray-600 ml-4 hover:text-green-500"
+              >Events</a
+            >
+            <a href="/user/login" class="text-gray-600 ml-4 hover:text-green-500"
+              >Login</a
+            >
+          </div>
+        </div>
+        <div>
+          <div
+            class="flex-1 w-1/2 pl-14 mt-20 flex float-left flex-col justify-center space-y-6"
+          >
+            <h1 class="text-5xl text-gray-800 font-bold">
+              Celebrate the Greens
+            </h1>
+            <p class="text-lg text-gray-600">
+              Celebrating a plantation event is a beautiful endeavor, fostering hope for a 
+              greener future as each tree planted becomes a symbol of environmental 
+              stewardship and collective commitment to sustainable growth. Let the joy of 
+              planting seeds today blossom into a flourishing legacy of nature's resilience.
+            </p>
+            <div class="flex space-x-4">
+                <a
+                  href="/user/login"
+                  class="bg-blue-500 text-white px-5 py-3 rounded-full hover:bg-blue-600"
+                >
+                  Login
+                </a>
+                <a
+                  href="/user/signup"
+                  class="bg-green-500 text-white px-5 py-3 rounded-full hover:bg-green-600"
+                >
+                  Signup
+                </a>
+              </div>
+          </div>
+          <div class="w-1/2 float-right">
+            <img
+              src="https://i.pinimg.com/564x/9b/a6/8b/9ba68b1d65fed2ccd9fed657eab3c39f.jpg"
+              class="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="m-40 mx-auto px-4 py-10">
+      <h2 class="text-2xl ml-20 justify-between font-bold mb-6">
+        Events Happening Now
+      </h2>
+      <div class="space-y-8">
+        <% if (events.length > 0) { %>
+            <% events.forEach(event => { %>
+                  <div class="w-auto length p-20 bg-emerald-50">
+                      <div class="flex justify-between items-center">
+                      <h3 class="text-xl font-semibold"><%= event.title %></h3>
+                      <span class="text-sm text-gray-500"><%= formattedDate(event.start_date).slice(3) %></span>
+                      </div>
+                      <p class="text-gray-600"><%= event.location %></p>
+                      <p class="my-2 text-gray-500"><%= formattedDate(event.start_date) %> - <%= formattedDate(event.end_date) %></p>
+                      <a href="/event/profile/<%= event.event_id %>" class="text-blue-600 hover:underline"
+                        >View Event Details →</a>
+                  </div>
+            <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

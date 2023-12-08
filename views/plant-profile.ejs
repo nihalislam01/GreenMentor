@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Plant Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="back bg-cover w-screen">
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+          alert('<%= message %>');
+        </script>
+      <% } %>
+      <nav class="nav">
+        <h1>GreenMentor</h1>
+        <div>
+          <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+            >Dashboard</a
+          >
+          <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >Plants</a
+          >
+          <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+            >Events</a
+          >
+          <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >My Plants</a
+        >
+          <% if(premium) { %>
+            <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+            >My Posts</a
+          >
+        <% } %>
+          <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+            >Profile</a
+          >
+        </div>
+      </nav>
+    <div class="ml-60 mb-10 mt-20 text-teal-900 text-5xl">
+      <h1>Plant Details</h1>
+    </div>
+    <div class="flex h-full max-w-5xl mx-auto text-black">
+      <div class="flex-1 bg-emerald-50 rounded-l-lg p-6">
+        <div class="flex justify-between items-center mb-4"></div>
+        <div class="text-center mb-4">
+          <h2 class="text-2xl font-bold"><%= plant_info.name %></h2>
+        </div>
+        <div class="mt-6">
+          <img
+            class="mx-auto"
+            src="<%= plant_info.image_url %>"
+            alt="Plant Image"
+          />
+        </div>
+      </div>
+      <div class="w-1/3 bg-emerald-100 p-4 rounded-r-3xl">
+        <div class="flex flex-col h-full justify-between">
+          <div class="p-20">
+            <div class="mb-4">
+              <p class="text-lg text-gray-600">Watering</p>
+              <p class="text-green-600 font-bold"><%= plant_info.watering %></p>
+            </div>
+            <div class="mb-4">
+              <% if(sunlight.length > 0) { %>
+                <p class="text-lg text-gray-600">Sunlight</p>
+                <p class="text-green-600 font-bold">
+                <% sunlight.forEach(element=>{ %>
+                  <%= element.sunlight %>, 
+                <% }); %>
+              <% } %>
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-center mt-4">
+            <div class="text-center">
+            <% if (isMine) { %>
+              <form action="/plant/remove/<%= plant_info.plant_id %>" method="post">
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-colors">
+                      Remove from profile
+                  </button>
+              </form>
+            <% } else { %>
+              <form action="/plant/add-to-profile/<%= plant_info.plant_id %>" method="post">
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-colors">
+                      Add to profile
+                  </button>
+              </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

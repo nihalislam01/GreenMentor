@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <style>
+      @media (min-width: 640px) {
+        .container {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-green-50">
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+          alert('<%= message %>');
+        </script>
+      <% } %>
+      <nav class="nav">
+        <h1>GreenMentor</h1>
+        <div>
+          <a href="/user/dashboard" class="text-gray-600 ml-4 hover:text-green-500"
+            >Dashboard</a
+          >
+          <a href="/user/plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >Plants</a
+          >
+          <a href="/user/events" class="text-gray-600 ml-4 hover:text-green-500"
+            >Events</a
+          >
+          <a href="/user/my-plants" class="text-gray-600 ml-4 hover:text-green-500"
+          >My Plants</a
+        >
+          <% if(premium) { %>
+            <a href="/user/my-posts" class="text-gray-600 ml-4 hover:text-green-500"
+            >My Posts</a
+          >
+        <% } %>
+          <a href="/user/profile" class="text-gray-600 ml-4 hover:text-green-500"
+            >Profile</a
+          >
+        </div>
+      </nav>
+    <div class="container mx-auto h-full bg-white rounded-lg shadow">
+      <div
+        class="p-4 border-b border-gray-200 mr-80 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <div
+            class="rounded-full h-10 w-10 bg-gray-200 flex justify-center items-center mr-8"
+          >
+            <span class="text-xl">🌱</span>
+          </div>
+          <div class="horizontally-aligned-space-between">
+            <% if(isMine) { %>
+              <h1 class="font-bold">My posts</h1>
+              <a href="/post/add" class="add-button">
+                <button type="submit">Add Post</button></a>
+            <% } else { %>
+              <h1 class="font-bold">Newfeed</h1>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <% if(posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+      <div class="p-4 space-y-4">
+        <div class="bg-emerald-100 mr-8 w-2/3 p-4 rounded-lg">
+          <div class="items-start space-x-4">
+            <div class="flex-1">
+                <div class="username">
+                    <div class="username">
+                      <% if (post.user_image) { %>
+                        <img
+                        class="rounded-full h-12 w-12 object-cover"
+                        src="/uploads/<%= post.user_image %>"
+                        />
+                      <% } else { %>
+                          <img
+                          class="rounded-full h-12 w-12 object-cover"
+                          src="/default_user.png"
+                          />
+                        <% } %>
+                        <h2 class="font-bold text-green-800"><%= post.first_name %></h2>
+                    </div>
+                    <span class="text-sm text-gray-500"><%= formattedDate(post.date).slice(3) %></span>
+              </div>
+              <p><%= post.location %></p>
+              <img
+                class="rounded-lg h-1/2 w-full object-cover"
+                src="/uploads/<%= post.post_image %>"
+              />
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+              </div>
+              <p class="text-gray-800 mt-2">
+                <%= post.description %>
+              </p>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center space-x-2">
+                  <form action="/post/like-pressed/<%= post.post_id %>/<%= post.user_id %>" method="post">
+                  <button type="submit" class="flex items-center space-x-1 like-button">
+                    <i class="fas fa-heart text-red-500"></i>
+                    <span class="text-gray-500"><%= post.likes %> Likes</span>
+                  </button>
+                </form>
+                  <% if(isMine) { %>
+                    <form action="/post/delete/<%= post.post_id %>" method="post">
+                      <button type="submit" class="flex items-center space-x-1 like-button">
+                        <i class="fas fa-heart text-red-500"></i>
+                        <span class="text-gray-500">Delete</span>
+                      </button>
+                    </form>
+                    <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+        <% } %>
+    </div>
+  </body>
+</html>

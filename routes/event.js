@@ -1,14 +1,34 @@
 const express = require('express');
 const connection = require('../connection');
 const auth = require('../services/authentication');
-var checkAdmin = require('../services/checkAdmin');
+const checkAdmin = require('../services/checkAdmin');
+const checkPremium = require('../services/checkPremium');
+const checkNonPremium = require('../services/checkNonPremium');
+const formattedDate = require('../services/formattedDate');
+const multer = require('multer');
+const path = require('path');
 const router = express.Router();
 
-router.get('/get',auth.authenticateToken,(request,response,next)=>{
-    var query = "select * from event order by event_id desc";
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, '..', 'assets','uploads'),
+    filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+  });
+  
+const upload = multer({ storage: storage });
+
+router.get('/get',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
+    const premium = request.user.premium;
+    var query = "select event_id,title,start_date,end_date,location from event order by event_id desc";
     connection.query(query,(error,results)=>{
         if(!error) {
-            response.render('events',{ message: request.query.message, events: results });
+            const current_date = new Date();
+            response.render('events',{ message: request.query.message,
+                                    events: results,
+                                    formattedDate: formattedDate.formattedDate,
+                                    current_date: current_date,
+                                    premium: premium});
         } else {
             var message = "Something went wrong. Please try again."
             response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
@@ -16,45 +36,161 @@ router.get('/get',auth.authenticateToken,(request,response,next)=>{
     });
 });
 
-router.post('/participate',auth.authenticateToken,(request,response,next)=>{
-    const requestParam = null;
-    const user_id = request.user.user_id;
-    const plant_image = request.body;
-    if (requestParam!=null) {
-        var query = `select start_date,end_date from event where event_id=${requestParam}`;
-        connection.query(query,(error,results)=>{
-            if (!error) {
-                const current_date = null;
-                if(current_date>results[0].start_date && current_date<[0].end_date) {
-                    query = `insert into user_participate_event(user_id,event_id,image,user_count) values(${user_id},${requestParam},?,0)`;
-                    connection.query(query,[plant_image.image],(error,results)=>{
+router.get('/profile/:event_id',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
+    const premium = request.user.premium;
+    const event_id = request.params.event_id;
+    var query = "Select * from event where event_id=?";
+    connection.query(query,[event_id],(error,results)=>{
+        if(!error) {
+            const user_id = request.user.user_id;
+            query = "select * from user_register_event where general_user_id=? and event_id=?";
+            connection.query(query,[user_id,event_id],(error,events)=>{
+                if(!error){
+                    query = "select * from participation inner join user on user.user_id=participation.general_user_id where participation.event_id=?";
+                    connection.query(query,[event_id],(error,participations)=>{
                         if(!error){
-                            response.redirect('/user/profile');
+                            var registered = 0;
+                            var event_happening = 0;
+                            var event_started = 0;
+                            const current_date = new Date();
+                            if(events.length > 0) { registered = 1; }
+                            if(results[0].start_date<current_date) {event_started = 1;}
+                            if(results[0].start_date<current_date && results[0].end_date>current_date) {event_happening = 1};
+                            response.render('event-profile',{ message: request.query.message, 
+                                                            event_info: results[0],
+                                                            participations: participations,
+                                                            formattedDate: formattedDate.formattedDate,
+                                                            event_started: event_started,
+                                                            event_happening: event_happening,
+                                                            registered: registered,
+                                                            premium: premium });
                         } else {
-                            response.status(500).send(error);// alert something went wrong
+                            var message = "Something went wrong. Please try again."
+                            response.redirect(`/user/events?message=${encodeURIComponent(message)}`);
                         }
                     });
                 } else {
-                    response.status(500).send(error);// alert date over
+                    var message = "Something went wrong. Please try again."
+                    response.redirect(`/user/events?message=${encodeURIComponent(message)}`);
                 }
-            } else {
-                response.status(500).send(error);// alert something went wrong
-            }
-        });
-    } else {
-        response.sendStatus(500);// alert something went wrong
-    }
+            });
+        } else {
+            var message = "Something went wrong. Please try again."
+            response.redirect(`/user/events?message=${encodeURIComponent(message)}`);
+        }
+    });
+});
+
+router.get('/register/:event_id',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
+     const user_id = request.user.user_id;
+     const event_id = request.params.event_id;
+     var query = "insert into user_register_event(general_user_id,event_id) values(?,?)";
+     connection.query(query,[user_id,event_id],(error,results)=>{
+        if(!error) {
+            response.redirect(`/event/profile/${event_id}?message=${encodeURIComponent(message)}`);
+        } else {
+            var message = "Something went wrong. Please try again.";
+            response.redirect(`/event/profile/${event_id}?message=${encodeURIComponent(message)}`);
+        }
+     });
+});
+
+router.get('/participate/:event_id',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
+    const premium = request.user.premium;
+    const event_id = request.params.event_id;
+    response.render('participate-form',{ message: request.query.message, event_id: event_id, premium: premium });
+});
+
+router.post('/participate/:event_id',auth.authenticateToken,checkNonPremium.checkNonPremium,upload.single('image'),(request,response,next)=>{
+    const user_id = request.user.user_id;
+    const event_id = request.params.event_id;
+    const body = request.body;
+    const image = request.file.filename;
+    const current_date = new Date();
+    var query = "insert into participation(plant_name,image,status,date,general_user_id,event_id) values(?,?,0,?,?,?)";
+    connection.query(query,[body.plant_name,image,current_date,user_id,event_id],(error,results)=>{
+        if(!error) {
+            var message = "Please wait for admin approval to showcase your plantation.";
+            response.redirect(`/event/profile/${event_id}?message=${encodeURIComponent(message)}`);
+        } else {
+            var message = "Something went wrong. Please try again.";
+            response.redirect(`/event/profile/${event_id}?message=${encodeURIComponent(message)}`);
+        }
+    });
 });
 
 //Admin User Controllers
-router.post('/add',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=>{
-    let event = request.body;
-    var query = "insert into event (start_date,end_date,location,admin_user_id) values (?,?,?,?)";
-    connection.query(query,[event.start_date,event.end_date,event.location,event.admin_user_id],(error,results)=>{
+router.get('/all-events',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const user_id = request.user.user_id;
+    const body = request.query;
+    var query = "select * from user where user_id=?";
+    connection.query(query,[user_id],(error,results)=>{
         if(!error) {
-            return response.status(200).json({message: "Event added successfully."});
+            if(body.search==undefined || body.search=="") {
+                query = "select * from event";
+            }else {
+                query = `select * from event where event_id like '%${body.search}%' or title like '%${body.search}%'`;
+            }
+            connection.query(query,(error,events)=>{
+                if(!error) {
+                    return response.render('all-event',{ message: request.query.message, user_info: results[0], events: events, formattedDate: formattedDate.formattedDate });
+                } else {
+                    var message = "Something went wrong. Please try again.";
+                    return response.redirect(`/plant/all-plants?mesage?=${encodeURIComponent(message)}`);
+                }
+            });
         } else {
-            return response.status(500).json(error);
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/plant/all-plants?mesage?=${encodeURIComponent(message)}`);
+        }
+    });
+});
+
+router.get('/add',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    response.render('add-event',{ message: request.query.message });
+});
+
+router.post('/add',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const user_id = request.user.user_id;
+    let event = request.body;
+    var query = "insert into event (start_date,end_date,location,title,description,admin_user_id) values (?,?,?,?,?,?)";
+    connection.query(query,[event.start_date,event.end_date,event.location,event.title,event.description,user_id],(error,results)=>{
+        if(!error) {
+            var message = "Event added successfully."
+            return response.redirect(`/event/all-events?message=${message}`)
+        } else {
+            var message = "Something went wrong. Please try again later."
+            return response.redirect(`/event/all-events?message=${message}`)
+        }
+    });
+});
+
+router.post('/delete/:event_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const event_id = request.params.event_id;
+    var query = "delete from participation where event_id=?";
+    connection.query(query,[event_id],(error,results)=>{
+        if(!error) {
+            query = "delete from user_register_event where event_id=?";
+            connection.query(query,[event_id],(error,results)=>{
+                if(!error) {
+                    query = "delete from event where event_id=?";
+                    connection.query(query,[event_id],(error,results)=>{
+                        if(!error) {
+                            var message = "Event Delete successfully.";
+                            return response.redirect(`/event/all-events?message=${encodeURIComponent(message)}`);
+                        } else {
+                            var message = "Something went wrong. Please try again.";
+                            return response.redirect(`/event/all-events?message=${encodeURIComponent(message)}`);
+                        }
+                    });
+                } else {
+                    var message = "Something went wrong. Please try again.";
+                    return response.redirect(`/event/all-events?message=${encodeURIComponent(message)}`);
+                }
+            })
+        } else {
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/event/all-events?message=${encodeURIComponent(message)}`);
         }
     });
 });

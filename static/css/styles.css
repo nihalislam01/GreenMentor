@@ -1,0 +1,105 @@
+.plantCard {
+  width: 250px;
+}
+
+.container {
+  padding-left: 180px;
+  padding-top: 100px;
+}
+
+.middle {
+  margin-left: 600px;
+}
+
+.back {
+  background-image: url("https://img.freepik.com/free-vector/watercolour-green-background_78370-1882.jpg?size=626&ext=jpg&ga=GA1.1.1222169770.1701734400&semt=ais");
+}
+
+.size {
+  width: 1500px;
+}
+
+.transparency-layer {
+  background-color: rgb(255, 255, 255);
+  backdrop-filter: blur(10px);
+  margin: 30px;
+  height: 500px;
+}
+
+.length {
+  height: 300px;
+}
+
+.profile-button {
+  display: flex;
+}
+
+.profile-button a {
+  margin-right: 20px;
+  text-align: center;
+}
+
+.searchbar {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.searchbar input {
+  width: 50%;
+  padding: 5px;
+  margin-right: 10px;
+  border-radius: 8px;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 50px 30px 50px;
+  background-color: #95d5b2;
+}
+
+.logout-button {
+  margin-left: 90px;
+}
+
+.logout-button button {
+  border: 2px solid grey;
+  border-radius: 30px;
+  padding: 10px 50px;
+}
+
+.logout-button button:hover {
+  background-color: grey;
+  color: white;
+}
+
+.username {
+  display: flex;
+  justify-content: space-between;
+}
+
+.like-button {
+  background-color: rgb(191, 220, 255);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.horizontally-aligned-space-between {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-button {
+  background-color: rgb(102, 163, 255);
+  padding: 5px 10px;
+  color: white;
+  border-radius: 8px;
+}
+
+.thumbnail {
+  height: 80px;
+  width: 80px;
+}
