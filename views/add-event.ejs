@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Add Events</title>
+  <link rel="stylesheet" href="/css/form-styles.css" />
+</head>
+<body>
+    <% if (message && message!=undefined && message!="" && message!="undefined") { %>
+        <script>
+            alert('<%= message %>');
+        </script>
+    <% } %>
+      <div class="form">
+      <form action="/event/add" method="post">
+          <input type="text" name="title" placeholder="Title">
+          <input type="date" name="start_date" placeholder="Start Date">
+          <input type="date" name="end_date" placeholder="End Date">
+          <input type="text" name="location" placeholder="Location">
+          <input type="text" name="description" placeholder="Description">
+          <button type="submit">Add Event</button>
+      </form>
+    </div>
+</body>
+</html>

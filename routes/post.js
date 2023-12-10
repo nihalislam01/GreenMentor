@@ -1,6 +1,7 @@
 const express = require('express');
 const connection = require('../connection');
 const auth = require('../services/authentication');
+const checkAdmin = require('../services/checkAdmin');
 var checkPremium = require('../services/checkPremium');
 const checkNonPremium = require('../services/checkNonPremium');
 const formattedDate = require('../services/formattedDate')
@@ -38,13 +39,13 @@ router.post('/like-pressed/:post_id/:user_id',auth.authenticateToken,checkNonPre
         return response.redirect("/user/dashboard");
     }
     var query = "select * from user_like_post where user_id=? and post_id=?";
-    connection.query(query,[user_id,post_id],(error,results)=>{
+    connection.query(query,[current_user_id,post_id],(error,results)=>{
         if(!error){
             if(results.length > 0) {
                 return response.redirect("/user/dashboard");
             } else {
                 var query = "insert into user_like_post(post_id,user_id) values(?,?)";
-                connection.query(query,[post_id,user_id],(error,results)=>{
+                connection.query(query,[post_id,current_user_id],(error,results)=>{
                     if(!error) {
                         var query = "update post set likes=likes+1 where post_id=?";
                         connection.query(query,[post_id],(error,results)=>{
@@ -66,6 +67,28 @@ router.post('/like-pressed/:post_id/:user_id',auth.authenticateToken,checkNonPre
             return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
         }
     })
+});
+
+router.post('/delete/:post_id',auth.authenticateToken,(request,response,next)=>{
+    const post_id = request.params.post_id;
+    var query = "delete from user_like_post where post_id=?";
+    connection.query(query,[post_id],(error,results)=>{
+        if(!error) {
+            var query = "delete from post where post_id=?";
+            connection.query(query,[post_id],(error,results)=>{
+                if(!error){
+                    var message = "Post deleted.";
+                    return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+                }else{
+                    var message = "Something went wrong. Please try again.";
+                    return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+                }
+            });
+        } else {
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+        }
+    });
 });
 
 //Premium User Controllers
@@ -105,24 +128,28 @@ router.post('/add',auth.authenticateToken,checkPremium.checkPremium,checkNonPrem
     });
 });
 
-router.post('/delete/:post_id',auth.authenticateToken,checkPremium.checkPremium,checkNonPremium.checkNonPremium,(request,response,next)=>{
-    const post_id = request.params.post_id;
-    var query = "delete from user_like_post where post_id=?";
-    connection.query(query,[post_id],(error,results)=>{
-        if(!error) {
-            var query = "delete from post where post_id=?";
-            connection.query(query,[post_id],(error,results)=>{
-                if(!error){
-                    var message = "Post deleted.";
-                    return response.redirect(`/user/my-posts?message=${encodeURIComponent(message)}`);
-                }else{
+//Admin User Controllers
+router.get('/all-posts',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const user_id = request.user.user_id;
+    var query = "select * from user where user_id=?"
+    connection.query(query,[user_id],(error,results)=>{
+        if(!error){
+            if(request.query.search==undefined || request.query.search==""){
+                query = "Select * from post inner join user on user.user_id=post.premium_user_id";
+            }else{
+                query = `Select * from post inner join user on user.user_id=post.premium_user_id where post.post_id like '%${request.query.search}%' or post.location like '%${request.query.search}%' or user.first_name like '%${request.query.search}%' or user.last_name like '%${request.query.search}%' or user.email like '%${request.query.search}%'`;
+            }
+            connection.query(query,(error,posts)=>{
+                if(!error) {
+                    return response.render('all-posts',{message:request.query.message,user_info: results[0], posts: posts, formattedDate: formattedDate.formattedDate});
+                } else {
                     var message = "Something went wrong. Please try again.";
-                    return response.redirect(`/user/my-posts?message=${encodeURIComponent(message)}`);
+                    return response.redirect(`user/dashboard?message=${encodeURIComponent(message)}`);
                 }
             });
-        } else {
+        }else{
             var message = "Something went wrong. Please try again.";
-            return response.redirect(`/user/my-posts?message=${encodeURIComponent(message)}`);
+            return response.redirect(`user/dashboard?message=${encodeURIComponent(message)}`);
         }
     });
 });

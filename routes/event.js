@@ -133,7 +133,7 @@ router.get('/all-events',auth.authenticateToken,checkAdmin.checkAdmin,(request,r
             }
             connection.query(query,(error,events)=>{
                 if(!error) {
-                    return response.render('all-event',{ message: request.query.message, user_info: results[0], events: events, formattedDate: formattedDate.formattedDate });
+                    return response.render('all-events',{ message: request.query.message, user_info: results[0], events: events, formattedDate: formattedDate.formattedDate });
                 } else {
                     var message = "Something went wrong. Please try again.";
                     return response.redirect(`/plant/all-plants?mesage?=${encodeURIComponent(message)}`);
@@ -191,6 +191,45 @@ router.post('/delete/:event_id',auth.authenticateToken,checkAdmin.checkAdmin,(re
         } else {
             var message = "Something went wrong. Please try again.";
             return response.redirect(`/event/all-events?message=${encodeURIComponent(message)}`);
+        }
+    });
+});
+
+router.get('/participation-queue',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const user_id = request.user.user_id;
+    var query = "select * from user where user_id=?";
+    connection.query(query,[user_id],(error,results)=>{
+        if(!error){
+            if(request.query.search==undefined || request.query.search==""){
+                query = "select * from participation where status=0";
+            } else {
+                query = `select * from (select * from participation where status=0) L1 where L1.participation_id like '%${request.query.search}' or L1.plant_name like '%${request.query.search}' or L1.date like '%${request.query.search}' or L1.general_user_id like '%${request.query.search}' or L1.event_id like '%${request.query.search}'`
+            }
+            connection.query(query,(error,participations)=>{
+                if(!error) {
+                    return response.render('participation-queue',{message: request.query.message, user_info: results[0], participations: participations, formattedDate: formattedDate.formattedDate})
+                } else {
+                    var message = "Something went wrong. Please tr again.";
+                    return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+                }
+            })
+        }else{
+            var message = "Something went wrong. Please tr again.";
+            return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+        }
+    });
+});
+
+router.post('/approve-participation/:participation_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const participation_id = request.params.participation_id;
+    var query = "update participation set status=1 where participation_id=?";
+    connection.query(query,[participation_id],(error,results)=>{
+        if(!error){
+            var message = "Participation approved successfully.";
+            return response.redirect(`/event/participation-queue?message=${encodeURIComponent(message)}`)
+        } else {
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/event/participation-queue?message=${encodeURIComponent(message)}`)
         }
     });
 });

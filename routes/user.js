@@ -85,9 +85,14 @@ router.post('/login',(request,response) => {
     });
 });
 
-router.get('/dashboard',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
+router.get('/dashboard',auth.authenticateToken,(request,response,next)=>{
     var message = request.query.message;
-    response.redirect(`/post/get?message=${encodeURIComponent(message)}`);
+    const admin = request.user.admin;
+    if(admin) {
+        return response.redirect(`/plant/all-plants?message=${encodeURIComponent(message)}`);
+    } else {
+        return response.redirect(`/post/get?message=${encodeURIComponent(message)}`);
+    }
 });
 
 router.get('/plants',auth.authenticateToken,checkNonPremium.checkNonPremium,(request,response,next)=>{
@@ -237,15 +242,10 @@ router.post('/logout',auth.authenticateToken,(request, response) => {
     response.redirect(`/user/login?message=${encodeURIComponent(message)}`);
 });
 
-router.get('/logout',auth.authenticateToken,(request, response) => {
-    response.clearCookie('token');
-    response.redirect('/user/login');// will delete later.
-});
-
 //Premium User Controllers
 router.get('/my-posts',auth.authenticateToken,checkPremium.checkPremium,checkNonPremium.checkNonPremium,(request,response,next)=>{
     var message = request.query.message;
-    response.redirect(`/post/my-posts?message=${encodeURIComponent(message)}`)
+    response.redirect(`/post/my-posts?message=${encodeURIComponent(message)}`);
 });
 
 router.get('/add-post',auth.authenticateToken,checkPremium.checkPremium,checkNonPremium.checkNonPremium,(request,response,next)=>{
@@ -280,40 +280,41 @@ router.get('/all-users',auth.authenticateToken,checkAdmin.checkAdmin,(request,re
     });
 });
 
-router.post('/delete/:user_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
-    const user_id = request.params.user_id;
-    var query = "delete from user where user_id=?";
+router.get('/premium-queue',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
+    const user_id = request.user.user_id;
+    var query = "select * from user where user_id=?";
     connection.query(query,[user_id],(error,results)=>{
         if(!error){
-            var message = "User deleted successfully.";
-            return response.redirect(`/user/all-users?message=${encodeURIComponent(message)}`);
-        }
-    })
-});
-
-router.get('/premium-queue',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
-    var query = "select * from payment where status=0";
-    connection.query(query,(error,results)=>{
-        if(!error) {
-            response.render('premium-queue',{ results });
-        } else {
-            var message = "Something went wrong.";
-            response.render('premium-queue',{ message });
+            if(request.query.search==undefined || request.query.search==""){
+                query = "select * from user inner join payment on user.user_id=payment.general_user_id where payment.status=0 and user.premium=0";
+            }else{
+                query = `select * from (select * from user inner join payment on user.user_id=payment.general_user_id where payment.status=0 and user.premium=0) L1 where L1.user_id like '%${request.query.search}%' or L1.email like '%${request.query.search}%' or L1.card_no like '%${request.query.search}%'`;
+            }
+            connection.query(query,(error,users)=>{
+                if(!error) {
+                    return response.render('premium-queue',{ message: request.query.message, user_info: results[0], users: users, formattedDate: formattedDate.formattedDate });
+                } else {
+                    var message = "Something went wrong. Please try again.";
+                    return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
+                }
+            });
+        }else{
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/user/dashboard?message=${encodeURIComponent(message)}`);
         }
     });
 });
 
 router.post('/approve-premium/:user_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response)=>{
     const user_id = request.params.user_id;
-    console.log(user_id);
     var query = `update user set premium=1 where user_id=${user_id}`;
     connection.query(query,(error,results)=>{
         if(!error) {
             var message = "User updated to premium.";
-            response.render('premium-queue',{ message });// new view
+            return response.redirect(`/user/premium-queue?message=${encodeURIComponent(message)}`);
         } else {
-            var message = "Something went wrong.";
-            response.render('premium-queue',{ message });// new view
+            var message = "Something went wrong. Please try again.";
+            return response.redirect(`/user/premium-queue?message=${encodeURIComponent(message)}`);
         }
     });
 });

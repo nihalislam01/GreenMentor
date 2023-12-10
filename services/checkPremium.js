@@ -2,7 +2,7 @@ require('dotenv').config();
 
 function checkPremium(request, response, next) {
     if(response.locals.premium == 0)
-        response.sendStatus(401)
+        response.redirect(`/user/dashboard?message=${encodeURIComponent("You're not athorized to view this page.")}`);
     else
         next()
 }

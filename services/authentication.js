@@ -8,7 +8,7 @@ function authenticateToken(request,response,next){
 
     jwt.verify(token,process.env.ACCESS_TOKEN,(err,res)=>{
         if(err)
-        return response.redirect(`/user/login?message=${encodeURIComponent("Please login.")}`);
+            return response.redirect(`/user/login?message=${encodeURIComponent("Please login.")}`);
         response.locals = res;
         request.user = res;
         next();

@@ -59,7 +59,7 @@
         <h2 class="text-3xl font-semibold mb-4">Edit Profile</h2>
         <form action="/user/update-profile" method="POST" enctype="multipart/form-data">
           <label for="image">Choose an image</label>
-          <input type="file" name="image" accept="image/*">
+          <input type="file" name="image" accept="image/*" required>
           <input
             type="text"
             name="first_name"
@@ -95,6 +95,7 @@
             type="text"
             name="phone_no"
             placeholder="Phone Number"
+            value="<%= user_info.phone_no %>"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4"
             required
           />

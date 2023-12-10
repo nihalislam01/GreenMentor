@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>User List</title>
+    <title>Post List</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/styles.css" />
@@ -31,8 +31,8 @@
           </div>
           <nav class="mb-4">
             <a href="/plant/all-plants" class="block mb-2">Plants</a>
-            <a href="/user/all-users" class="block mb-2 text-green-600">Users</a>
-            <a href="/post/all-posts" class="block mb-2">Posts</a>
+            <a href="/user/all-users" class="block mb-2">Users</a>
+            <a href="/post/all-posts" class="block mb-2 text-green-600">Posts</a>
             <a href="/event/all-events" class="block mb-2">Events</a>
             <a href="/user/premium-queue" class="block mb-2">Premium Queue</a>
             <a href="/event/participation-queue" class="block mb-2">Participation Queue</a>
@@ -46,14 +46,14 @@
         <div class="p-8">
           <div class="p-8">
             <div class="flex justify-between items-center mb-6">
-              <h1 class="text-2xl pl-4 font-bold text-emerald-800">User list</h1>
-              <form action="/user/all-users" class="flex">
+              <h1 class="text-2xl pl-4 font-bold text-emerald-800">Post list</h1>
+              <form action="/post/all-posts" class="flex">
                 <div class="pt-2 relative mx-auto text-gray-600">
                     <input
                     class="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
                     type="search"
                     name="search"
-                    placeholder="Search user..."
+                    placeholder="Search post..."
                     />
                 </div>
                 <button type="submit"><i class="fa-solid fa-magnifying-glass fa-xl"></i></button>
@@ -65,26 +65,33 @@
                 <tr>
                   <th class="text-left pl-2">ID</th>
                   <th class="text-left pl-2">Image</th>
-                  <th class="text-left pl-2">Name</th>
-                  <th class="text-left pl-2">Email</th>
-                  <th class="text-left pl-2">Phone Number</th>
-                  <th class="text-left pl-2">Date of Birth</th>
+                  <th class="text-left pl-2">User Name</th>
+                  <th class="text-left pl-2">User Email</th>
+                  <th class="text-left pl-2">Date</th>
+                  <th class="text-left pl-2">Location</th>
+                  <th class="text-left pl-2">Likes</th>
                 </tr>
               </thead>
               <tbody>
-                <% if(users.length > 0) { %>
-                    <% users.forEach(user=>{ %>
+                <% if(posts.length > 0) { %>
+                    <% posts.forEach(post=>{ %>
                         <tr>
-                          <td><%= user.user_id %></td>
-                          <% if(user.image!=null) { %>
-                            <td><image class="thumbnail" src="/uploads/<%= user.image %>" ></image></td>
+                          <td><%= post.post_id %></td>
+                          <% if(post.image!=null) { %>
+                            <td><image class="thumbnail" src="/uploads/<%= post.image %>" ></image></td>
                           <% } else { %>
-                            <td><image class="thumbnail" src="/default_user.png" ></image></td>
+                            <td><image class="thumbnail" src="/defaultImage.png" ></image></td>
                           <% } %>
-                          <td><%= user.first_name %> <%= user.last_name %></td>
-                          <td class="pl-2"><%= user.email %></td>
-                          <td class="pl-2"><%= user.phone_no %></td>
-                          <td class="pl-2"><%= formattedDate(user.birth_date) %></td>
+                          <td><%= post.first_name %> <%= post.last_name %></td>
+                          <td><%= post.email %></td>
+                          <td><%= formattedDate(post.date) %></td>
+                          <td class="pl-2"><%= post.location %></td>
+                          <td class="pl-2"><%= post.likes %></td>
+                          <td class="pl-2"><form action="/post/delete/<%= post.post_id %>" method="post">
+                            <div class="mb-4">
+                                <button type="submit" class="text-white-500 bg-red-500 pt-2 pb-2 pl-4 pr-4 mr-20 mt-6 rounded-lg">Delete Post</button>
+                            </div>
+                          </form></td>
                         </tr>
                     <% }); %>
                 <% } %>

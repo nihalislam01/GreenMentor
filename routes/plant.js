@@ -174,34 +174,23 @@ router.post('/add',auth.authenticateToken,checkAdmin.checkAdmin,(request,respons
                             connection.query(query,[element,plants[0].plant_id],(error,results)=>{
                                 if(error){
                                     var message = "Something went wrong. Please try again."
-                                    return response.redirect(`/user/all-plants?message=${encodeURIComponent(message)}`);
+                                    return response.redirect(`/plant/all-plants?message=${encodeURIComponent(message)}`);
                                 }
                             });
                         }
                     });
                     var message = "Plant added successfully.";
-                    return response.redirect(`/user/all-plants?message=${encodeURIComponent(message)}`);
+                    return response.redirect(`/plant/all-plants?message=${encodeURIComponent(message)}`);
                 } else {
                     var message = "Something went wrong. Please try again."
-                    return response.redirect(`/user/all-plants?message=${encodeURIComponent(message)}`);
+                    return response.redirect(`/plant/all-plants?message=${encodeURIComponent(message)}`);
                 }
             })
         } else {
             var message = "Something went wrong. Please try again."
-            return response.redirect(`/user/all-plants?message=${encodeURIComponent(message)}`);
-        }
-    });
-});
-
-router.post('/delete/:plant_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
-    const plant_id = request.params.plant_id;
-    var query = "delete from user_add where plant_id=?";
-    connection.query(query,[plant_id],(error,results)=>{
-        if(!error){
-            var message = "Plant deleted successfully.";
             return response.redirect(`/plant/all-plants?message=${encodeURIComponent(message)}`);
         }
-    })
+    });
 });
 
 router.post('/delete/:plant_id',auth.authenticateToken,checkAdmin.checkAdmin,(request,response,next)=>{
